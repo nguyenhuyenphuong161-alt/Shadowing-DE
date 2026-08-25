@@ -2,196 +2,221 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Luyện Shadowing Tiếng Đức - A2</title>
+    <title>Luyện Shadowing Tiếng Đức Tự Động</title>
     <script src="https://www.youtube.com/iframe_api"></script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; padding: 20px; margin: 0; }
         .container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 700px; margin: auto; }
         h2 { color: #333; text-align: center; }
         
-        .mode-selector { display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; background: #e9ecef; padding: 10px; border-radius: 8px; }
-        .mode-selector label { font-weight: bold; cursor: pointer; }
+        /* Chuyển đổi Tabs */
+        .tab-menu { display: flex; justify-content: center; margin-bottom: 20px; border-bottom: 2px solid #ddd; }
+        .tab-btn { background: none; border: none; padding: 10px 20px; font-size: 16px; font-weight: bold; cursor: pointer; color: #7f8c8d; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+        .tab-btn.active { color: #3498db; border-bottom-color: #3498db; }
         
         .panel { display: none; }
         .panel.active { display: block; }
         
-        select, textarea { padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; margin-bottom: 15px; }
-        textarea { resize: vertical; min-height: 100px; }
-        
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; margin-bottom: 20px; }
+        /* Form nhập liệu */
+        label { font-weight: bold; display: block; margin-bottom: 5px; margin-top: 15px; color: #2c3e50; }
+        input[type="text"], textarea { width: 100%; padding: 10px; font-size: 15px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+        textarea { height: 150px; font-family: monospace; resize: vertical; }
+        .btn-generate { background: #27ae60; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 20px; font-size: 16px; transition: 0.3s; }
+        .btn-generate:hover { background: #219150; }
+
+        /* Giao diện luyện tập */
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; margin-bottom: 20px; background: #000; display: none; }
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-        .transcript-box { background: #f8f9fa; border-radius: 8px; padding: 15px; max-height: 300px; overflow-y: auto; border: 1px solid #ddd; margin-bottom: 20px; }
+        .transcript-box { background: #f8f9fa; border-radius: 8px; padding: 15px; max-height: 350px; overflow-y: auto; border: 1px solid #ddd; margin-bottom: 20px; display: none; }
         .sentence-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: 0.2s; }
         .sentence-item:hover { background-color: #e9ecef; }
         .sentence-item.active { background-color: #d4edda; border-left: 4px solid #28a745; font-weight: bold; }
         
         .btn-play { background: #3498db; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;}
-        .btn-generate { background: #8e44ad; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px; }
         
-        .action-area { text-align: center; margin-bottom: 20px; }
+        .action-area { text-align: center; margin-bottom: 20px; display: none; }
         .btn-record { background-color: #e74c3c; color: white; padding: 12px 24px; font-size: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; max-width: 350px; }
         
-        .result-box { padding: 15px; background: #ecf0f1; border-radius: 8px; min-height: 80px; text-align: left; line-height: 1.6; }
+        .result-box { padding: 15px; background: #ecf0f1; border-radius: 8px; min-height: 80px; text-align: left; line-height: 1.6; display: none; }
         .word-correct { color: #27ae60; font-weight: bold; }
         .word-wrong { color: #c0392b; font-weight: bold; text-decoration: underline; }
         
         .progress-wrapper { width: 100%; background-color: #ddd; border-radius: 8px; margin-top: 15px; overflow: hidden; display: none; height: 12px; }
         .progress-bar { height: 100%; width: 0%; transition: width 0.6s ease; }
         .score-text { margin-top: 8px; font-weight: bold; font-size: 16px; color: #2c3e50; display: none; text-align: center; }
+        
+        .empty-state { text-align: center; color: #7f8c8d; font-style: italic; padding: 40px 0; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Hệ thống Luyện Shadowing Tiếng Đức</h2>
+        <h2>Shadowing Tiếng Đức</h2>
         
-        <div class="mode-selector">
-            <label><input type="radio" name="mode" value="youtube" checked onchange="switchMode()"> 📺 Chế độ YouTube</label>
-            <label><input type="radio" name="mode" value="ai" onchange="switchMode()"> 🤖 Chế độ AI (Tự động)</label>
+        <div class="tab-menu">
+            <button class="tab-btn active" id="tab-setup" onclick="switchTab('setup')">⚙️ Thêm Video Mới</button>
+            <button class="tab-btn" id="tab-practice" onclick="switchTab('practice')">🎧 Luyện Tập</button>
         </div>
 
-        <!-- Bảng điều khiển YouTube -->
-        <div id="panel-youtube" class="panel active">
-            <select id="topic-select" onchange="loadYouTubeLesson()">
-                <option value="lari_morning">Bài 1: Buổi sáng cùng Lari (Morning Routine)</option>
-            </select>
-            <div class="video-container" id="player-container">
+        <!-- BẢNG 1: NHẬP DỮ LIỆU -->
+        <div id="panel-setup" class="panel active">
+            <label>1. ID Video YouTube:</label>
+            <input type="text" id="video-id-input" placeholder="Ví dụ: QOqwVP9U-1c">
+            
+            <label>2. Dán nội dung file .SRT vào đây:</label>
+            <textarea id="srt-input" placeholder="1
+00:00:13,000 --> 00:00:17,000
+Guten Morgen..."></textarea>
+            
+            <button class="btn-generate" onclick="processData()">🚀 Tạo bài học ngay</button>
+        </div>
+
+        <!-- BẢNG 2: GIAO DIỆN HỌC -->
+        <div id="panel-practice" class="panel">
+            <div id="empty-message" class="empty-state">Chưa có dữ liệu. Vui lòng thêm video ở tab "Thêm Video Mới".</div>
+            
+            <div class="video-container" id="video-container">
                 <div id="player"></div>
             </div>
-        </div>
 
-        <!-- Bảng điều khiển AI -->
-        <div id="panel-ai" class="panel">
-            <p style="margin-top: 0; color: #555; font-size: 14px;">Dán bất kỳ đoạn văn bản tiếng Đức nào vào đây, hệ thống sẽ tự cắt câu và tạo bài học ngay lập tức.</p>
-            <textarea id="ai-text">Ich unterrichte Mathematik für die neunte Klasse. Ein gleichschenkliges Dreieck hat genau zwei gleich lange Seiten. Nebenbei plane ich, einen YouTube-Kanal zu starten. Ich möchte lernen, wie man mit Videos Geld verdienen kann. Vielleicht kann ich sogar KI-Tools wie VEO für die Videoproduktion nutzen.</textarea>
-            <button class="btn-generate" onclick="generateAILesson()">⚙️ Tự động tạo bài học</button>
-        </div>
+            <div class="transcript-box" id="transcript-container"></div>
+            
+            <div class="action-area" id="action-area">
+                <button class="btn-record" id="record-btn" onclick="startShadowing()">🎙️ Bấm để thu âm câu đang chọn</button>
+            </div>
+            
+            <div class="result-box" id="result-container">
+                <div style="text-align: center; color: #7f8c8d; font-style: italic;">Chọn 1 câu ở trên, nghe và bấm thu âm...</div>
+            </div>
 
-        <!-- Vùng hiển thị câu (Dùng chung cho cả 2 chế độ) -->
-        <div class="transcript-box" id="transcript-container"></div>
-        
-        <div class="action-area">
-            <button class="btn-record" id="record-btn" onclick="startShadowing()">🎙️ Bấm để thu âm câu đang chọn</button>
+            <div class="progress-wrapper" id="progress-wrapper">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="score-text" id="score-text"></div>
         </div>
-        
-        <div class="result-box" id="result-container">
-            <div style="text-align: center; color: #7f8c8d; font-style: italic;">Chọn 1 câu ở trên, nghe và bấm thu âm...</div>
-        </div>
-
-        <div class="progress-wrapper" id="progress-wrapper">
-            <div class="progress-bar" id="progress-bar"></div>
-        </div>
-        <div class="score-text" id="score-text"></div>
     </div>
 
     <script>
-        let currentMode = 'youtube';
+        let currentLesson = { videoId: "", transcript: [] };
         let currentSentenceIndex = 0;
-        let activeSentences = []; 
         let player;
         let playTimeout;
+        let isPlayerReady = false;
 
-        // --- CƠ SỞ DỮ LIỆU YOUTUBE CÓ SẴN ---
-        const youtubeDB = {
-            "lari_morning": {
-                videoId: "QOqwVP9U-1c",
-                transcript: [
-                    { start: 13, end: 17, text: "Guten Morgen, ich bin gerade aufgewacht." },
-                    { start: 93, end: 97, text: "Ich trinke ein großes Glas Wasser." },
-                    { start: 245, end: 249, text: "Dann wasche ich mein Gesicht." },
-                    { start: 563, end: 568, text: "Mein Tag heute ist voll verplant." },
-                    { start: 604, end: 609, text: "Jetzt fühle ich mich für den heutigen Tag vorbereitet." }
-                ]
+        // Chuyển đổi Tab
+        function switchTab(tabName) {
+            document.getElementById('tab-setup').classList.toggle('active', tabName === 'setup');
+            document.getElementById('tab-practice').classList.toggle('active', tabName === 'practice');
+            document.getElementById('panel-setup').classList.toggle('active', tabName === 'setup');
+            document.getElementById('panel-practice').classList.toggle('active', tabName === 'practice');
+        }
+
+        // --- BỘ XỬ LÝ SRT ---
+        function processData() {
+            const videoId = document.getElementById('video-id-input').value.trim();
+            const srtText = document.getElementById('srt-input').value.trim();
+
+            if (!videoId || !srtText) {
+                alert("Vui lòng nhập đủ ID Video và nội dung SRT!");
+                return;
             }
-        };
 
-        function switchMode() {
-            const modes = document.getElementsByName('mode');
-            modes.forEach(radio => {
-                if (radio.checked) {
-                    currentMode = radio.value;
-                    document.getElementById('panel-youtube').classList.toggle('active', currentMode === 'youtube');
-                    document.getElementById('panel-ai').classList.toggle('active', currentMode === 'ai');
+            // Phân tích văn bản SRT
+            const blocks = srtText.split(/\n\s*\n/);
+            const parsedTranscript = [];
+
+            for (let block of blocks) {
+                const lines = block.split('\n');
+                if (lines.length >= 3) {
+                    const timeLine = lines[1];
+                    // Gom chữ, xóa thẻ HTML (nếu có)
+                    const textLines = lines.slice(2).join(' ').replace(/<[^>]*>?/gm, '').trim();
+                    const timeMatch = timeLine.match(/(\d{2}):(\d{2}):(\d{2}),(\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2}),(\d{3})/);
                     
-                    if (currentMode === 'youtube') {
-                        loadYouTubeLesson();
-                    } else {
-                        if(player && typeof player.pauseVideo === 'function') player.pauseVideo();
-                        generateAILesson();
+                    if (timeMatch && textLines.length > 0) {
+                        const start = parseInt(timeMatch[1])*3600 + parseInt(timeMatch[2])*60 + parseInt(timeMatch[3]) + parseInt(timeMatch[4])/1000;
+                        const end = parseInt(timeMatch[5])*3600 + parseInt(timeMatch[6])*60 + parseInt(timeMatch[7]) + parseInt(timeMatch[8])/1000;
+                        parsedTranscript.push({ start: start, end: end, text: textLines });
                     }
-                    resetScore();
                 }
-            });
+            }
+
+            if (parsedTranscript.length === 0) {
+                alert("Không nhận diện được định dạng SRT. Vui lòng kiểm tra lại text đã dán.");
+                return;
+            }
+
+            // Lưu vào bộ nhớ tạm
+            currentLesson.videoId = videoId;
+            currentLesson.transcript = parsedTranscript;
+
+            // Khởi tạo giao diện học
+            setupPracticeUI();
         }
 
-        // --- XỬ LÝ YOUTUBE ---
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-                height: '390',
-                width: '640',
-                videoId: youtubeDB["lari_morning"].videoId,
-                playerVars: { 'playsinline': 1, 'rel': 0 },
-                events: { 'onReady': () => loadYouTubeLesson() }
-            });
-        }
-
-        function loadYouTubeLesson() {
-            const topic = document.getElementById('topic-select').value;
-            activeSentences = youtubeDB[topic].transcript.map(item => item.text);
+        // --- CÀI ĐẶT YOUTUBE & GIAO DIỆN ---
+        function setupPracticeUI() {
+            document.getElementById('empty-message').style.display = 'none';
+            document.getElementById('video-container').style.display = 'block';
+            document.getElementById('transcript-container').style.display = 'block';
+            document.getElementById('action-area').style.display = 'block';
+            document.getElementById('result-container').style.display = 'block';
             
-            if(player && typeof player.loadVideoById === 'function') {
-                player.loadVideoById(youtubeDB[topic].videoId);
+            // Xóa điểm cũ
+            resetScore();
+            renderTranscript();
+            
+            // Xử lý YouTube Player
+            if (!player) {
+                // Nếu player chưa từng được tạo, hãy tạo mới
+                player = new YT.Player('player', {
+                    height: '390',
+                    width: '640',
+                    videoId: currentLesson.videoId,
+                    playerVars: { 'playsinline': 1, 'rel': 0 },
+                    events: { 'onReady': () => { isPlayerReady = true; } }
+                });
+            } else {
+                // Nếu player đã có, chỉ cần tải video mới
+                player.loadVideoById(currentLesson.videoId);
                 player.pauseVideo();
             }
-            renderTranscript('youtube');
+
+            // Tự động chuyển sang tab Luyện tập
+            switchTab('practice');
         }
 
-        // --- XỬ LÝ AI (TỰ ĐỘNG CẮT VĂN BẢN) ---
-        function generateAILesson() {
-            const rawText = document.getElementById('ai-text').value;
-            // Dùng biểu thức chính quy (Regex) để tự động cắt câu dựa trên dấu chấm, chấm hỏi, chấm than
-            activeSentences = rawText.match(/[^.?!]+[.?!]+/g) || [rawText];
-            activeSentences = activeSentences.map(s => s.trim()).filter(s => s.length > 0);
-            renderTranscript('ai');
-        }
-
-        // --- HIỂN THỊ GIAO DIỆN ---
-        function renderTranscript(modeSource) {
+        function renderTranscript() {
             const container = document.getElementById('transcript-container');
             container.innerHTML = "";
             currentSentenceIndex = 0;
 
-            activeSentences.forEach((text, index) => {
+            currentLesson.transcript.forEach((item, index) => {
                 const div = document.createElement('div');
                 div.className = `sentence-item ${index === 0 ? 'active' : ''}`;
                 div.id = `sentence-${index}`;
                 div.innerHTML = `
-                    <span style="flex: 1; font-size: 16px;">${text}</span>
-                    <button class="btn-play" onclick="playAudio(${index}, '${modeSource}')">▶ Nghe</button>
+                    <span style="flex: 1; font-size: 16px;">${item.text}</span>
+                    <button class="btn-play" onclick="playAudio(${index})">▶ Nghe</button>
                 `;
                 container.appendChild(div);
             });
         }
 
-        function playAudio(index, source) {
+        function playAudio(index) {
+            if (!isPlayerReady && !player) return;
             currentSentenceIndex = index;
             document.querySelectorAll('.sentence-item').forEach(el => el.classList.remove('active'));
             document.getElementById(`sentence-${index}`).classList.add('active');
 
-            if (source === 'youtube') {
-                const topic = document.getElementById('topic-select').value;
-                const sentence = youtubeDB[topic].transcript[index];
-                clearTimeout(playTimeout);
-                player.seekTo(sentence.start);
-                player.playVideo();
-                playTimeout = setTimeout(() => { player.pauseVideo(); }, (sentence.end - sentence.start) * 1000);
-            } else {
-                // Chế độ AI sẽ tự động đọc bằng giọng chuẩn của trình duyệt
-                const utterance = new SpeechSynthesisUtterance(activeSentences[index]);
-                utterance.lang = 'de-DE';
-                utterance.rate = 0.85;
-                window.speechSynthesis.speak(utterance);
-            }
+            const sentence = currentLesson.transcript[index];
+            clearTimeout(playTimeout);
+            player.seekTo(sentence.start);
+            player.playVideo();
+            
+            // Bù thêm 0.5s để video không bị ngắt quá gắt
+            const duration = (sentence.end - sentence.start + 0.5) * 1000;
+            playTimeout = setTimeout(() => { player.pauseVideo(); }, duration);
         }
 
         // --- THU ÂM VÀ CHẤM ĐIỂM ---
@@ -246,7 +271,7 @@
             
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
-                const originalText = activeSentences[currentSentenceIndex];
+                const originalText = currentLesson.transcript[currentSentenceIndex].text;
                 const evaluation = compareSpeech(originalText, transcript);
                 
                 document.getElementById('result-container').innerHTML = `
@@ -274,6 +299,10 @@
                     scoreText.style.color = '#c0392b';
                 }
             };
+            
+            recognition.onerror = () => {
+                document.getElementById('result-container').innerHTML = '<div style="color: red; text-align: center;">Không nghe rõ, vui lòng thử lại!</div>';
+            }
             
             recognition.onend = () => {
                 btn.innerText = "🎙️ Bấm để thu âm câu đang chọn";
