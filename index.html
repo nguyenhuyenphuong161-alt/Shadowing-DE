@@ -2,70 +2,65 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Luyện Shadowing Tiếng Đức - A2</title>
+    <title>Luyện Shadowing Tiếng Đức cùng YouTube</title>
+    <script src="https://www.youtube.com/iframe_api"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background-color: #f0f2f5; padding: 40px; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
-        h2 { color: #333; }
-        .controls { margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        select { padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; cursor: pointer; outline: none; min-width: 250px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; padding: 20px; margin: 0; }
+        .container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 700px; margin: auto; }
+        h2 { color: #333; text-align: center; }
         
-        /* CSS cho thanh trượt tốc độ */
-        .speed-control { display: flex; align-items: center; gap: 10px; font-size: 15px; color: #555; }
-        input[type="range"] { cursor: pointer; }
+        .controls { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 20px; }
+        select { padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; width: 100%; max-width: 400px; cursor: pointer; }
+        
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; margin-bottom: 20px; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-        .sentence { font-size: 22px; font-weight: bold; margin: 30px 0; color: #2c3e50; min-height: 60px; display: flex; align-items: center; justify-content: center; }
-        .btn-group button { padding: 10px 20px; font-size: 15px; margin: 5px; cursor: pointer; border: none; border-radius: 8px; font-weight: bold; color: white; transition: 0.3s; }
+        .transcript-box { background: #f8f9fa; border-radius: 8px; padding: 15px; max-height: 250px; overflow-y: auto; border: 1px solid #ddd; margin-bottom: 20px; }
+        .sentence-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: 0.2s; }
+        .sentence-item:hover { background-color: #e9ecef; }
+        .sentence-item.active { background-color: #d4edda; border-left: 4px solid #28a745; font-weight: bold; }
         
-        .btn-play { background-color: #3498db; }
-        .btn-record { background-color: #e74c3c; }
-        .btn-nav { background-color: #2ecc71; color: white; }
-        .btn-disabled { background-color: #95a5a6 !important; cursor: not-allowed !important; }
+        .btn-play { background: #3498db; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
         
-        .result-box { margin-top: 20px; padding: 15px; background: #ecf0f1; border-radius: 8px; min-height: 80px; text-align: left; line-height: 1.6; }
+        .action-area { text-align: center; margin-bottom: 20px; }
+        .btn-record { background-color: #e74c3c; color: white; padding: 12px 24px; font-size: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; max-width: 300px; }
+        
+        .result-box { padding: 15px; background: #ecf0f1; border-radius: 8px; min-height: 80px; text-align: left; line-height: 1.6; }
         .word-correct { color: #27ae60; font-weight: bold; }
         .word-wrong { color: #c0392b; font-weight: bold; text-decoration: underline; }
-        .raw-text { color: #7f8c8d; font-style: italic; font-size: 14px; margin-bottom: 10px; border-bottom: 1px dashed #bdc3c7; padding-bottom: 10px; }
-        .saved-notice { color: #c0392b; font-size: 14px; font-weight: bold; margin-top: 10px; display: none; text-align: center;}
         
         .progress-wrapper { width: 100%; background-color: #ddd; border-radius: 8px; margin-top: 15px; overflow: hidden; display: none; height: 12px; }
-        .progress-bar { height: 100%; width: 0%; transition: width 0.6s ease, background-color 0.6s ease; }
-        .score-text { margin-top: 8px; font-weight: bold; font-size: 18px; color: #2c3e50; display: none; }
+        .progress-bar { height: 100%; width: 0%; transition: width 0.6s ease; }
+        .score-text { margin-top: 8px; font-weight: bold; font-size: 16px; color: #2c3e50; display: none; text-align: center; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Luyện Shadowing - Trình độ A2</h2>
+        <h2>Shadowing Qua YouTube - A2</h2>
         
         <div class="controls">
-            <div>
-                <label for="topic-select"><strong>Chủ đề: </strong></label>
-                <select id="topic-select" onchange="changeTopic()">
-                    <option value="alltag">Alltag (Đời sống)</option>
-                    <option value="schule">Schule & Arbeit (Trường học & Công việc)</option>
-                    <option value="reisen">Reisen (Du lịch)</option>
-                    <option value="review" style="font-weight: bold; color: #c0392b;">⚠️ Cần ôn tập</option>
-                </select>
-            </div>
-            
-            <div class="speed-control">
-                <label for="speed-slider">Tốc độ đọc: <strong id="speed-label">0.85x</strong></label>
-                <input type="range" id="speed-slider" min="0.5" max="1.5" step="0.05" value="0.85" oninput="updateSpeed()">
-            </div>
+            <select id="topic-select" onchange="changeTopic()">
+                <option value="alltag">Chủ đề 1: Đời sống hàng ngày (Alltag)</option>
+                <option value="schule">Chủ đề 2: Dạy học & Lớp 9 (Schule)</option>
+                <option value="youtube">Chủ đề 3: Làm kênh YouTube (Content Creator)</option>
+            </select>
         </div>
 
-        <div class="sentence" id="text-to-shadow">...</div>
+        <div class="video-container" id="player-container">
+            <div id="player"></div>
+        </div>
+
+        <div class="transcript-box" id="transcript-container">
+            <!-- Transcript sẽ được tạo tự động bằng Javascript -->
+        </div>
         
-        <div class="btn-group">
-            <button class="btn-play" id="play-btn" onclick="playAudio()">🔊 Nghe mẫu</button>
-            <button class="btn-record" id="record-btn" onclick="startShadowing()">🎙️ Đọc</button>
-            <button class="btn-nav" id="next-btn" onclick="nextSentence()">⏭️ Câu tiếp</button>
+        <div class="action-area">
+            <button class="btn-record" id="record-btn" onclick="startShadowing()">🎙️ Bấm để thu âm câu đang chọn</button>
         </div>
         
         <div class="result-box" id="result-container">
-            <div style="text-align: center; color: #7f8c8d; font-style: italic;">Nhấn "Đọc" để bắt đầu...</div>
+            <div style="text-align: center; color: #7f8c8d; font-style: italic;">Chọn 1 câu ở trên, nghe và bấm thu âm...</div>
         </div>
-        <div class="saved-notice" id="saved-notice">📥 Đã tự động lưu câu này vào danh sách "Cần ôn tập"!</div>
 
         <div class="progress-wrapper" id="progress-wrapper">
             <div class="progress-bar" id="progress-bar"></div>
@@ -74,90 +69,105 @@
     </div>
 
     <script>
-        const savedReviewList = JSON.parse(localStorage.getItem('german_a2_review_list')) || [];
-
+        // --- 1. CƠ SỞ DỮ LIỆU YOUTUBE ---
+        // Bạn có thể thay đổi ID video YouTube (đoạn mã sau v= trong link youtube)
         const database = {
-            "alltag": [
-                "Ich habe am Wochenende das Museum besucht.",
-                "Können Sie mir bitte helfen? Ich suche den Supermarkt.",
-                "Gestern war das Wetter wirklich schön und warm."
-            ],
-            "schule": [
-                "Ich unterrichte Mathematik in der neunten Klasse.",
-                "Ein gleichschenkliges Dreieck hat zwei gleich lange Seiten.",
-                "Nächste Woche schreiben wir einen wichtigen Test."
-            ],
-            "reisen": [
-                "Der Zug nach Berlin fährt um acht Uhr ab.",
-                "Ich möchte ein Doppelzimmer mit Frühstück reservieren.",
-                "Wo ist hier der nächste Bahnhof, bitte?"
-            ],
-            "review": savedReviewList 
+            "alltag": {
+                videoId: "sW9aScCS2e4", // ID Video ví dụ (Easy German)
+                transcript: [
+                    { start: 10, end: 12.5, text: "Guten Morgen, wie geht es dir heute?" },
+                    { start: 13, end: 16, text: "Ich habe am Wochenende das Museum besucht." },
+                    { start: 17, end: 20, text: "Das Wetter war wirklich schön und warm." }
+                ]
+            },
+            "schule": {
+                videoId: "4K3Jt-0W4A0", // ID Video giáo dục
+                transcript: [
+                    { start: 25, end: 29, text: "Ich bin Lehrer und unterrichte Mathematik." },
+                    { start: 30, end: 34, text: "Meine Schüler in der neunten Klasse sind sehr fleißig." },
+                    { start: 35, end: 40, text: "Wir üben heute Geometrie und lösen Aufgaben." }
+                ]
+            },
+            "youtube": {
+                videoId: "h3_h0MteP5o", // ID Video về content
+                transcript: [
+                    { start: 45, end: 49, text: "Ich möchte einen neuen YouTube-Kanal starten." },
+                    { start: 50, end: 54, text: "Wie kann man mit Videos im Internet Geld verdienen?" },
+                    { start: 55, end: 60, text: "Man braucht gute Inhalte und eine klare Strategie." }
+                ]
+            }
         };
 
         let currentTopic = "alltag";
-        let currentIndex = 0;
+        let currentSentenceIndex = 0;
+        let player;
+        let playTimeout;
 
-        function updateSpeed() {
-            const speedValue = document.getElementById('speed-slider').value;
-            document.getElementById('speed-label').innerText = speedValue + "x";
+        // --- 2. CÀI ĐẶT YOUTUBE PLAYER ---
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '390',
+                width: '640',
+                videoId: database[currentTopic].videoId,
+                playerVars: { 'playsinline': 1, 'rel': 0 },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
         }
 
-        function updateLocalStorage() {
-            localStorage.setItem('german_a2_review_list', JSON.stringify(database.review));
-        }
-
-        function loadSentence() {
-            const sentences = database[currentTopic];
-            const playBtn = document.getElementById('play-btn');
-            const recordBtn = document.getElementById('record-btn');
-            const nextBtn = document.getElementById('next-btn');
-
-            if (currentTopic === 'review' && sentences.length === 0) {
-                document.getElementById('text-to-shadow').innerText = "🎉 Tuyệt vời! Bạn không có câu nào cần ôn tập.";
-                document.getElementById('result-container').innerHTML = '';
-                playBtn.classList.add('btn-disabled'); playBtn.disabled = true;
-                recordBtn.classList.add('btn-disabled'); recordBtn.disabled = true;
-                nextBtn.classList.add('btn-disabled'); nextBtn.disabled = true;
-            } else {
-                document.getElementById('text-to-shadow').innerText = sentences[currentIndex];
-                document.getElementById('result-container').innerHTML = '<div style="text-align: center; color: #7f8c8d; font-style: italic;">Nhấn "Đọc" để bắt đầu...</div>';
-                playBtn.classList.remove('btn-disabled'); playBtn.disabled = false;
-                recordBtn.classList.remove('btn-disabled'); recordBtn.disabled = false;
-                nextBtn.classList.remove('btn-disabled'); nextBtn.disabled = false;
-            }
-            
-            document.getElementById('progress-wrapper').style.display = 'none';
-            document.getElementById('score-text').style.display = 'none';
-            document.getElementById('saved-notice').style.display = 'none';
+        function onPlayerReady(event) {
+            loadTranscript();
         }
 
         function changeTopic() {
             currentTopic = document.getElementById('topic-select').value;
-            currentIndex = 0;
-            loadSentence();
+            currentSentenceIndex = 0;
+            player.loadVideoById(database[currentTopic].videoId);
+            player.pauseVideo();
+            loadTranscript();
+            resetScore();
         }
 
-        function nextSentence() {
-            const sentences = database[currentTopic];
-            if (sentences.length > 0) {
-                const maxIndex = sentences.length - 1;
-                currentIndex = (currentIndex < maxIndex) ? currentIndex + 1 : 0;
-            }
-            loadSentence();
+        // --- 3. HIỂN THỊ TRANSCRIPT ---
+        function loadTranscript() {
+            const container = document.getElementById('transcript-container');
+            container.innerHTML = "";
+            const sentences = database[currentTopic].transcript;
+
+            sentences.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = `sentence-item ${index === currentSentenceIndex ? 'active' : ''}`;
+                div.id = `sentence-${index}`;
+                div.innerHTML = `
+                    <span style="flex: 1; font-size: 16px;">${item.text}</span>
+                    <button class="btn-play" onclick="playVideoSegment(${index})">▶ Nghe</button>
+                `;
+                container.appendChild(div);
+            });
         }
 
-        function playAudio() {
-            const text = document.getElementById('text-to-shadow').innerText;
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'de-DE';
+        // Tua và phát video theo mốc thời gian của từng câu
+        function playVideoSegment(index) {
+            clearTimeout(playTimeout);
+            currentSentenceIndex = index;
             
-            const currentSpeed = parseFloat(document.getElementById('speed-slider').value);
-            utterance.rate = currentSpeed; 
-            
-            window.speechSynthesis.speak(utterance);
+            // Cập nhật giao diện câu đang chọn
+            document.querySelectorAll('.sentence-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`sentence-${index}`).classList.add('active');
+
+            const sentence = database[currentTopic].transcript[index];
+            player.seekTo(sentence.start);
+            player.playVideo();
+
+            // Tự động dừng video khi đọc xong câu
+            const duration = (sentence.end - sentence.start) * 1000;
+            playTimeout = setTimeout(() => {
+                player.pauseVideo();
+            }, duration);
         }
 
+        // --- 4. NHẬN DIỆN & CHẤM ĐIỂM (Không thay đổi) ---
         function compareSpeech(originalText, spokenText) {
             const cleanString = (str) => str.toLowerCase().replace(/[.,?!]/g, "");
             const originalWords = originalText.split(" ");
@@ -181,15 +191,25 @@
                 }
             }
             
-            const scorePercent = Math.round((correctCount / cleanOriginalWords.length) * 100);
-            return { html: evaluatedHTML, score: scorePercent };
+            return { 
+                html: evaluatedHTML, 
+                score: Math.round((correctCount / cleanOriginalWords.length) * 100) 
+            };
+        }
+
+        function resetScore() {
+            document.getElementById('result-container').innerHTML = '<div style="text-align: center; color: #7f8c8d; font-style: italic;">Chọn 1 câu ở trên, nghe và bấm thu âm...</div>';
+            document.getElementById('progress-wrapper').style.display = 'none';
+            document.getElementById('score-text').style.display = 'none';
         }
 
         function startShadowing() {
             if (!('webkitSpeechRecognition' in window)) {
-                alert("Trình duyệt không hỗ trợ. Vui lòng dùng Chrome.");
+                alert("Trình duyệt không hỗ trợ. Vui lòng dùng Google Chrome.");
                 return;
             }
+            
+            player.pauseVideo(); // Dừng video nếu đang chạy để tránh nhiễu mic
             
             const recognition = new webkitSpeechRecognition();
             const btn = document.getElementById('record-btn');
@@ -198,19 +218,18 @@
             recognition.start();
             
             recognition.onstart = () => {
-                btn.innerText = "⏳ Đang nghe...";
+                btn.innerText = "⏳ Đang nghe... Hãy nói ngay!";
                 btn.style.backgroundColor = "#f39c12";
-                document.getElementById('saved-notice').style.display = 'none';
             };
             
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
-                const originalText = document.getElementById('text-to-shadow').innerText;
+                const originalText = database[currentTopic].transcript[currentSentenceIndex].text;
                 const evaluation = compareSpeech(originalText, transcript);
                 
                 document.getElementById('result-container').innerHTML = `
-                    <div class="raw-text"><strong>Máy nghe được:</strong> ${transcript}</div>
-                    <div><strong>Đánh giá:</strong> ${evaluation.html}</div>
+                    <div style="font-size: 14px; margin-bottom: 10px; color: #7f8c8d;"><strong>Máy nghe được:</strong> ${transcript}</div>
+                    <div style="font-size: 18px;"><strong>Đánh giá:</strong> ${evaluation.html}</div>
                 `;
 
                 const progressWrapper = document.getElementById('progress-wrapper');
@@ -219,51 +238,30 @@
 
                 progressWrapper.style.display = 'block';
                 scoreText.style.display = 'block';
-                
                 setTimeout(() => { progressBar.style.width = evaluation.score + '%'; }, 100);
                 scoreText.innerText = `Độ chính xác: ${evaluation.score}%`;
 
                 if (evaluation.score >= 80) {
                     progressBar.style.backgroundColor = '#27ae60';
                     scoreText.style.color = '#27ae60';
-                    
-                    if (currentTopic === 'review') {
-                        database.review.splice(currentIndex, 1);
-                        updateLocalStorage();
-                        
-                        setTimeout(() => { 
-                            alert("Tốt lắm! Câu này đã được xóa khỏi danh sách ôn tập.");
-                            currentIndex = 0;
-                            loadSentence(); 
-                        }, 1000);
-                    }
-
                 } else if (evaluation.score >= 50) {
                     progressBar.style.backgroundColor = '#f39c12';
                     scoreText.style.color = '#f39c12';
                 } else {
                     progressBar.style.backgroundColor = '#c0392b';
                     scoreText.style.color = '#c0392b';
-                    
-                    if (currentTopic !== 'review' && !database.review.includes(originalText)) {
-                        database.review.push(originalText);
-                        updateLocalStorage();
-                        document.getElementById('saved-notice').style.display = 'block';
-                    }
                 }
             };
             
             recognition.onerror = () => {
-                document.getElementById('result-container').innerHTML = '<div style="color: red;">Không nghe rõ, vui lòng thử lại!</div>';
+                document.getElementById('result-container').innerHTML = '<div style="color: red; text-align: center;">Không nghe rõ, vui lòng thử lại!</div>';
             }
             
             recognition.onend = () => {
-                btn.innerText = "🎙️ Đọc";
+                btn.innerText = "🎙️ Bấm để thu âm câu đang chọn";
                 btn.style.backgroundColor = "#e74c3c";
             };
         }
-
-        window.onload = loadSentence;
     </script>
 </body>
 </html>
